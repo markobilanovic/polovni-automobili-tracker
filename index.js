@@ -58,7 +58,6 @@ async function start() {
     }
   
     if (isDirty) {
-      console.log(db);
       await sendEmailOfDatabase(db);
     }
   
