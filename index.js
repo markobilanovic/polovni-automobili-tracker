@@ -27,12 +27,8 @@ const db = [
 
 let browser;
 let page;
-let timerID;
 
 async function init() {
-  if (timerID) {
-    clearInterval(timerID);
-  }
   console.log("Launching browser...");
   browser = await puppeteer.launch({
     headless: true,
@@ -43,8 +39,6 @@ async function init() {
   console.log("Browser initialized!");
   
   start();
-
-  timerID = setInterval(start, 180 * 1000); 
 }
 
 async function start() {
@@ -69,6 +63,11 @@ async function start() {
     }
   
     console.log("Script ended!");
+
+    setTimeout(() => {
+      start();
+    }, 180 * 1000);
+
   } catch (e) {
     console.log("Error!", e);
     if (browser) {
