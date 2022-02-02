@@ -5,3 +5,5 @@ heroku buildpacks:add --index 1 heroku/nodejs
 
 heroku builds:cache:purge -a fast-refuge-86416
 git commit --allow-empty -m "Purge cache"
+
+heroku ps:scale web=1
