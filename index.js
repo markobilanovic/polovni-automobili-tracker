@@ -85,14 +85,18 @@ async function getNewArticles(baseURL, processedIds) {
   await page.goto(baseURL);
 
   // process first page
+  console.log(`Processing page: 1`);
   articles.push(...await processPage(baseURL, processedIds, false));
+  console.log(`Page 1 done!`);
 
   // process rest of the pages
   const pagesCount = await getPagesCount();
   if (pagesCount > 1) {
     for (let i = 2; i <= pagesCount; i++) {
       const url = baseURL + "&page=" + i;
+      console.log(`Processing page: ${i}`);
       articles.push(...await processPage(url, processedIds));
+      console.log(`Page ${i} done!`);
     }
   }
 
@@ -101,7 +105,6 @@ async function getNewArticles(baseURL, processedIds) {
 
 async function processPage(url, processedIds, loadPageFirst = true) {
   const articlesForProcessing = [];
-  // console.log("\n", "Processing page:", url, "\n");
   if (loadPageFirst) {
     await page.goto(url);
   }
@@ -134,7 +137,6 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         });
       }
   }
-
   return articlesForProcessing;
 }
 
