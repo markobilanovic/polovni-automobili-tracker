@@ -60,8 +60,9 @@ async function start() {
     console.log("closing...");
     await browser.close();
   } catch (e) {
+    console.log("Error!", e);
     if (browser) {
-      console.log("closing with error!", e);
+      console.log("force closing browser...");
       await browser.close();
     }
   }
