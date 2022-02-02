@@ -28,15 +28,18 @@ const db = [
 let browser;
 let page;
 
+async function init() {
+  browser = await puppeteer.launch({
+    headless: true,
+    args : ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  page = await browser.newPage();
+  page.setDefaultNavigationTimeout(30 * 1000);
+}
+
 async function start() {
   try{
     console.log("start...");
-    browser = await puppeteer.launch({
-      headless: true,
-      args : ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
-    page = await browser.newPage();
-    page.setDefaultNavigationTimeout(30 * 1000);
     let isDirty = false;
   
     for (const item of db) {    
@@ -54,13 +57,13 @@ async function start() {
       await sendEmailOfDatabase(db);
     }
   
-    console.log("closing...");
-    await browser.close();
+    console.log("end...");
   } catch (e) {
     console.log("Error!", e);
     if (browser) {
       console.log("force closing browser...");
       await browser.close();
+      await init();
     }
   }
   
@@ -166,7 +169,11 @@ async function getPagesCount() {
   return pagesCount;
 }
 
-start();
+init();
+setTimeout(() => {
+  start();
+}, 5000);
+
 var timerID = setInterval(start, 180 * 1000); 
 
 // clearInterval(timerID);

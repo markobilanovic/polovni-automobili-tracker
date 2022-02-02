@@ -3,5 +3,5 @@ heroku buildpacks:add --index 1 https://github.com/jontewks/puppeteer-heroku-bui
 heroku buildpacks:add --index 1 heroku/nodejs
 
 
-heroku builds:cache:purge -a example-app
+heroku builds:cache:purge -a fast-refuge-86416
 git commit --allow-empty -m "Purge cache"
