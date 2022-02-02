@@ -35,7 +35,7 @@ async function init() {
     args : ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   page = await browser.newPage();
-  page.setDefaultNavigationTimeout(60 * 1000);
+  page.setDefaultNavigationTimeout(120 * 1000);
   console.log("Browser initialized!");
   
   start();
