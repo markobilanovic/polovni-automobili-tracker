@@ -64,6 +64,7 @@ async function start() {
     }
   
     if (isDirty) {
+      console.log(db);
       await sendEmailOfDatabase(db);
     }
   
@@ -157,7 +158,8 @@ async function getArticleURL(articleElement) {
 async function processArticles(articles, title) {
   const htmls = articles.map((article) => `<div>${article.innerHTML}</div>`);
   const html = htmls.join('<br/>');
-  await sendEmail(`Novi oglasi za: ${title}`, "", html);
+  const dateStr = new Date().toLocaleTimeString('en-US');
+  await sendEmail(`Novi oglasi za: ${title} - ${dateStr}`, "", html);
 }
 
 async function sendEmail(subject, text, html) {
@@ -166,7 +168,8 @@ async function sendEmail(subject, text, html) {
 
 async function sendEmailOfDatabase(db) {
   const content = db.map((item) => `${item.title}: ${item.processedIds.join(",")}`).join("\n");
-  await mailService.sendEmail(["bilanovic90@gmail.com"], "polovni-automobili-scraper DB update", content, "");
+  const dateStr = new Date().toLocaleTimeString('en-US');
+  await mailService.sendEmail(["bilanovic90@gmail.com"], `polovni-automobili-scraper DB update - ${dateStr}`, content, "");
 }
 
 
