@@ -1,16 +1,16 @@
 const puppeteer = require('puppeteer');
 const mailService = require('./mailService');
-// var express = require('express');
-// var app = express();
-// var path = require('path');
+var express = require('express');
+var app = express();
+var path = require('path');
 
-// app.get('/', function (req, res) {
-//     res.sendFile(path.join(__dirname, 'index.html'));
-// });
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-// app.listen(process.env.PORT || 4000, function () {
-//     console.log('Node app is working!');
-// });
+app.listen(process.env.PORT || 4000, function () {
+    console.log('Node app is working!');
+});
 
 const db = [
   {
@@ -27,8 +27,12 @@ const db = [
 
 let browser;
 let page;
+let timerID;
 
 async function init() {
+  if (timerID) {
+    clearInterval(timerID);
+  }
   console.log("Launching browser...");
   browser = await puppeteer.launch({
     headless: true,
@@ -37,6 +41,10 @@ async function init() {
   page = await browser.newPage();
   page.setDefaultNavigationTimeout(60 * 1000);
   console.log("Browser initialized!");
+  
+  start();
+
+  timerID = setInterval(start, 180 * 1000); 
 }
 
 async function start() {
@@ -172,10 +180,3 @@ async function getPagesCount() {
 }
 
 init();
-setTimeout(() => {
-  start();
-}, 5000);
-
-var timerID = setInterval(start, 180 * 1000); 
-
-// clearInterval(timerID);
