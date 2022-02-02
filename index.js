@@ -1,16 +1,16 @@
 const puppeteer = require('puppeteer');
 const mailService = require('./mailService');
-var express = require('express');
-var app = express();
-var path = require('path');
+// var express = require('express');
+// var app = express();
+// var path = require('path');
 
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+// app.get('/', function (req, res) {
+//     res.sendFile(path.join(__dirname, 'index.html'));
+// });
 
-app.listen(process.env.PORT || 4000, function () {
-    console.log('Node app is working!');
-});
+// app.listen(process.env.PORT || 4000, function () {
+//     console.log('Node app is working!');
+// });
 
 const db = [
   {
@@ -29,17 +29,19 @@ let browser;
 let page;
 
 async function init() {
+  console.log("Launching browser...");
   browser = await puppeteer.launch({
     headless: true,
     args : ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   page = await browser.newPage();
-  page.setDefaultNavigationTimeout(30 * 1000);
+  page.setDefaultNavigationTimeout(60 * 1000);
+  console.log("Browser initialized!");
 }
 
 async function start() {
   try{
-    console.log("start...");
+    console.log("Start script...");
     let isDirty = false;
   
     for (const item of db) {    
@@ -57,11 +59,11 @@ async function start() {
       await sendEmailOfDatabase(db);
     }
   
-    console.log("end...");
+    console.log("Script ended!");
   } catch (e) {
     console.log("Error!", e);
     if (browser) {
-      console.log("force closing browser...");
+      console.log("Force closing browser...");
       await browser.close();
       await init();
     }
