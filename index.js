@@ -32,10 +32,8 @@ async function start() {
   try{
     console.log("start...");
     browser = await puppeteer.launch({
-      'args' : [
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ]
+      headless: true,
+      args : ['--no-sandbox', '--disable-setuid-sandbox'],
     });
     browser = await puppeteer.launch();
     page = await browser.newPage();
