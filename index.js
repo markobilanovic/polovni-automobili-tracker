@@ -31,7 +31,12 @@ let page;
 async function start() {
   try{
     console.log("start...");
-    browser = await puppeteer.launch();
+    browser = await puppeteer.launch({
+      'args' : [
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
+    });
     page = await browser.newPage();
     page.setDefaultNavigationTimeout(30 * 1000);
     let isDirty = false;
