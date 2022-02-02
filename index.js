@@ -37,6 +37,7 @@ async function start() {
         '--disable-setuid-sandbox'
       ]
     });
+    browser = await puppeteer.launch();
     page = await browser.newPage();
     page.setDefaultNavigationTimeout(30 * 1000);
     let isDirty = false;
@@ -60,7 +61,7 @@ async function start() {
     await browser.close();
   } catch (e) {
     if (browser) {
-      console.log("closing with error!");
+      console.log("closing with error!", e);
       await browser.close();
     }
   }
@@ -168,6 +169,6 @@ async function getPagesCount() {
 }
 
 start();
-var timerID = setInterval(start, 1800 * 1000); 
+var timerID = setInterval(start, 180 * 1000); 
 
 // clearInterval(timerID);
