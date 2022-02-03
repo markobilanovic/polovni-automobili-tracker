@@ -42,8 +42,12 @@ async function init() {
 }
 
 async function finish() {
-  await page.close();
-  await browser.close();
+  if (page) {
+    await page.close();
+  }
+  if (browser) {
+    await browser.close();
+  }
 }
 
 async function startAgain(seconds) {
