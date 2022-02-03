@@ -36,6 +36,15 @@ async function init() {
   });
   page = await browser.newPage();
   page.setDefaultNavigationTimeout(120 * 1000);
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if (req.resourceType() === 'image') {
+      req.abort();
+    }
+    else {
+      req.continue();
+    }
+  });
   console.log("Browser initialized!");
   
   start();
