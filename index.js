@@ -3,6 +3,7 @@ const mailService = require('./mailService');
 var express = require('express');
 var app = express();
 var path = require('path');
+const e = require('express');
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -38,32 +39,28 @@ async function init() {
   page.setDefaultNavigationTimeout(120 * 1000);
   await page.setRequestInterception(true);
   page.on('request', (req) => {
-    if (req.resourceType() === 'image') {
+    const resourceType = req.resourceType();
+
+    if (resourceType !== "document") {
       req.abort();
-    }
-    else {
+    } else {
       req.continue();
     }
+
+    // if (resourceType === 'image' ||
+    //     resourceType === 'font' ||
+    //     resourceType === 'stylesheet')
+    // {
+    //   req.abort();
+    // }
+    // else 
+    // {
+    //   req.continue();
+    // }
   });
   console.log("Browser initialized!");
   
   start();
-}
-
-async function finish() {
-  if (page) {
-    await page.close();
-  }
-  if (browser) {
-    await browser.close();
-  }
-}
-
-async function startAgain(seconds) {
-  await finish();
-  setTimeout(() => {
-    init();
-  }, seconds * 1000);
 }
 
 async function start() {
@@ -88,11 +85,19 @@ async function start() {
   
     console.log("Script ended!");
 
-    await startAgain(900);
+    setTimeout(() => {
+      start();
+    }, 900 * 1000);
 
   } catch (e) {
     console.log("Error!", e);
-    await startAgain(60);
+    if (browser) {
+      console.log("Force closing browser...");
+      await browser.close();
+      setTimeout(() => {
+        init();
+      }, 180 * 1000);
+    }
   }
   
 }
