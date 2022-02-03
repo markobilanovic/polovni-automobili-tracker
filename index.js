@@ -41,6 +41,18 @@ async function init() {
   start();
 }
 
+async function finish() {
+  await page.close();
+  await browser.close();
+}
+
+async function startAgain(seconds) {
+  await finish();
+  setTimeout(() => {
+    init();
+  }, seconds * 1000);
+}
+
 async function start() {
   try{
     console.log("Start script...");
@@ -63,17 +75,11 @@ async function start() {
   
     console.log("Script ended!");
 
-    setTimeout(() => {
-      start();
-    }, 180 * 1000);
+    await startAgain(900);
 
   } catch (e) {
     console.log("Error!", e);
-    if (browser) {
-      console.log("Force closing browser...");
-      await browser.close();
-      await init();
-    }
+    await startAgain(60);
   }
   
 }
