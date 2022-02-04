@@ -36,10 +36,7 @@ const db = [
 // create table
 // await client.query('CREATE TABLE tasks(title text, email text, url text, processedIds integer[])');
 
-// await addNewTask('Peugeot 308',
-//                  'bilanovic90@gmail.com',
-//                  'https://www.polovniautomobili.com/auto-oglasi/pretraga?sort=tagValue131_asc&brand=peugeot&model%5B0%5D=308&year_from=2014&chassis%5B0%5D=2631&city_distance=0&showOldNew=all&without_price=1'
-//                  );
+
 async function addNewTask(title, email, url) {
   try {
     const client = await pool.connect();
@@ -112,7 +109,6 @@ async function start() {
       if (articles.length) {
         await processArticles(articles, title, email);
         await updateTask(title, email, articles.map((article) => article.id));
-        // processedids.push(...articles.map((article) => article.id));
       }
     }
   
@@ -120,7 +116,7 @@ async function start() {
 
     setTimeout(() => {
       start();
-    }, 2 * 60 * 1000);
+    }, 15 * 60 * 1000);
 
   } catch (e) {
     console.log("Error!", e);
@@ -129,7 +125,7 @@ async function start() {
       await browser.close();
       setTimeout(() => {
         init();
-      }, 30 * 1000);
+      }, 2 * 60 * 1000);
     }
   }
   
@@ -235,4 +231,9 @@ async function getPagesCount() {
   return pagesCount;
 }
 
-init();
+// init();
+
+addNewTask('Kia Ceed',
+                 'bilanovic90@gmail.com',
+                 'https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=kia&model%5B%5D=ceed&brand2=&price_from=&price_to=&year_from=2014&year_to=&chassis%5B%5D=2631&flywheel=&atest=&door_num=&submit_1=&without_price=1&date_limit=&showOldNew=all&modeltxt=&engine_volume_from=&engine_volume_to=&power_from=&power_to=&mileage_from=&mileage_to=&emission_class=&seat_num=&wheel_side=&registration=&country=&country_origin=&city=&registration_price=&page=5&sort=tagValue131_asc'
+                 );
