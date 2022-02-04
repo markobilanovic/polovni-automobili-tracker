@@ -136,11 +136,7 @@ async function getArticleURL(articleElement) {
 async function processArticles(articles, title, email) {
   const htmls = articles.map((article) => `<div>${article.innerHTML}</div>`);
   const html = htmls.join('<br/>');
-  await sendEmail(email, `Novi oglasi za: ${title} - ${date}`, "", html);
-}
-
-async function sendEmail(to, subject, text, html) {
-  await mailService.sendEmail([to], subject, text, html);
+  await mailService.sendEmail([email], `Novi oglasi za: ${title} - ${date}`, "", html);
 }
 
 async function getPagesCount() {
