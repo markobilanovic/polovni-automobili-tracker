@@ -106,6 +106,9 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         // attach image
         innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
 
+        // fix url
+        innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
+
         articlesForProcessing.push({
           id: articleID,
           url,
