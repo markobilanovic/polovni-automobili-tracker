@@ -8,7 +8,7 @@ app.get('/', (req, res) => {
 
 app.post('/addRecord', (req, res) => {
   const {title, email, url} = req.body;
-  await db.addNewTask(title, email, url);
+  db.addNewTask(title, email, url);
 });
 
 
