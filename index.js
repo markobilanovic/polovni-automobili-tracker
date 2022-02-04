@@ -40,12 +40,19 @@ async function init() {
 
   try {
     const client = await pool.connect();
+    await client.query('CREATE TABLE tasks(title text, email text, url text, processedIds integer[])');
+    // const result = await client.query('SELECT * FROM tasks');
+    // const results = result ? result.rows : null;
+    // console.log(results);
+    client.release();
+  } catch (err) {
+    console.error(err);
+  } finally {
+    const client = await pool.connect();
     const result = await client.query('SELECT * FROM tasks');
     const results = result ? result.rows : null;
     console.log(results);
     client.release();
-  } catch (err) {
-    console.error(err);
   }
 
   console.log("Launching browser...");
