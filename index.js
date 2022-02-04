@@ -1,78 +1,20 @@
 const puppeteer = require('puppeteer');
 const mailService = require('./mailService');
+const db = require('./db');
 var express = require('express');
 var app = express();
 var path = require('path');
-const e = require('express');
-const { Pool } = require('pg');
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+let browser;
+let page;
+
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(process.env.PORT || 4000, function () {
-    console.log('Node app is working!');
-});
-
-const db = [
-  // {
-  //   title: "Peugeot 308",
-  //   url: "https://www.polovniautomobili.com/auto-oglasi/pretraga?sort=tagValue131_asc&brand=peugeot&model%5B0%5D=308&year_from=2014&chassis%5B0%5D=2631&city_distance=0&showOldNew=all&without_price=1",
-  //   processedIds: [17233908,19287264,19205256,19057223,19003948,19211277,18870469,19026066,19346544,19149596,19097082,19105309,19209758,19287352,19333957,19003429,19177440,19273419,19253453,18996225,19391752,19131221,19385096,19144553,18893666,19385925,18968267,19255390,19311205,19022643,18887838,19334929,18346398,18717994,19066347,19193278,19087121,18276110,18647045,18554121,19265513,18901645,19235122,18911876,19124257,19044880,19069892,19192073,19392240,19198074,19066492,19344599,19021606,18837905,18989317,19156237,19221410,16818142,19290995,18794874,18992344,19148558,18898978,18538061,18586402,18882864,19194424,19334047,18589843,18894827,19195457,18197763,19101766,18926789,17300050,19098275,19204524,19142998,18856843,19148932,18427693,19376012,18896882,18748978,18739852,19055385,18973693,19350075,17910977,18536880,19034619,19065693,19127397,19169768,18882870,19113454,17107112,19323999,18485555,18722493,19177174,19342891,19031725],
-  // },
-  // {
-  //   title: "Kia Ceed",
-  //   url: "https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=kia&model%5B%5D=ceed&brand2=&price_from=&price_to=&year_from=2014&year_to=&chassis%5B%5D=2631&flywheel=&atest=&door_num=&submit_1=&without_price=1&date_limit=&showOldNew=all&modeltxt=&engine_volume_from=&engine_volume_to=&power_from=&power_to=&mileage_from=&mileage_to=&emission_class=&seat_num=&wheel_side=&registration=&country=&country_origin=&city=&registration_price=&page=5&sort=tagValue131_asc",
-  //   processedIds: [17913644,16798194,18193609,18806012,18889149,18810398,18675209],
-  // }
-];
-
-// create table
-// await client.query('CREATE TABLE tasks(title text, email text, url text, processedIds integer[])');
+app.listen(process.env.PORT || 4000, () => console.log('Node app is working!'));
 
 
-async function addNewTask(title, email, url) {
-  try {
-    const client = await pool.connect();
-    await client.query(`insert into tasks (title, email, url, processedIds) values ('${title}', '${email}', '${url}', '{}')`);
-    client.release();
-  } catch (err) {
-    console.error(err);
-  } 
-}
-
-async function getTasks() {
-  try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM tasks');
-    const results = result ? result.rows : null;
-    client.release();
-    return results;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function updateTask(title, email, newIds) {
-  try {
-    const client = await pool.connect();
-    const query = `UPDATE tasks SET processedIds = processedIds || '{${newIds.join(",")}}' WHERE title = '${title}' AND email='${email}'`;
-    await client.query(query);
-    client.release();
-  } catch (err) {
-    console.error(err);
-  } 
-}
-
-
-let browser;
-let page;
 
 async function init() {
   console.log("Launching browser...");
@@ -91,33 +33,27 @@ async function init() {
       req.continue();
     }
   });
-  console.log("Browser initialized!");
-  
   start();
 }
 
 async function start() {
   try{
     console.log("Start script...");
-
-    const tasks = await getTasks();
-
+    const tasks = await db.getTasks();
     for (const task of tasks) {    
       const {title, email, url, processedids} = task;
       console.log("Process", title);
       const articles = await getNewArticles(url, processedids.map((id) => id.toString()));
       if (articles.length) {
         await processArticles(articles, title, email);
-        await updateTask(title, email, articles.map((article) => article.id));
+        await db.updateTask(title, email, articles.map((article) => article.id));
       }
     }
   
     console.log("Script ended!");
-
     setTimeout(() => {
       start();
     }, 15 * 60 * 1000);
-
   } catch (e) {
     console.log("Error!", e);
     if (browser) {
@@ -215,13 +151,6 @@ async function sendEmail(to, subject, text, html) {
   await mailService.sendEmail([to], subject, text, html);
 }
 
-async function sendEmailOfDatabase(db) {
-  const content = db.map((item) => `${item.title}: ${item.processedIds.join(",")}`).join("\n");
-  const dateStr = new Date().toLocaleTimeString('en-US');
-  await mailService.sendEmail(["bilanovic90@gmail.com"], `polovni-automobili-scraper DB update - ${dateStr}`, content, "");
-}
-
-
 async function getPagesCount() {
   const [totalItemsDiv] = await page.$x("//small[contains(., 'Prikazano od')]");
   const totalItemsString = await page.evaluate(el => el.textContent, totalItemsDiv);
@@ -231,9 +160,4 @@ async function getPagesCount() {
   return pagesCount;
 }
 
-// init();
-
-addNewTask('Kia Ceed',
-                 'bilanovic90@gmail.com',
-                 'https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=kia&model%5B%5D=ceed&brand2=&price_from=&price_to=&year_from=2014&year_to=&chassis%5B%5D=2631&flywheel=&atest=&door_num=&submit_1=&without_price=1&date_limit=&showOldNew=all&modeltxt=&engine_volume_from=&engine_volume_to=&power_from=&power_to=&mileage_from=&mileage_to=&emission_class=&seat_num=&wheel_side=&registration=&country=&country_origin=&city=&registration_price=&page=5&sort=tagValue131_asc'
-                 );
+init();
