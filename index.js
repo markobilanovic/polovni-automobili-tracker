@@ -40,7 +40,9 @@ async function init() {
 
   try {
     const client = await pool.connect();
-    await client.query('CREATE TABLE tasks(title text, email text, url text, processedIds integer[])');
+    // await client.query('CREATE TABLE tasks(title text, email text, url text, processedIds integer[])');
+    await client.query('INSERT INTO table_name(Peugeot 308, bilanovic90@gmail.com, https://www.polovniautomobili.com/auto-oglasi/pretraga?sort=tagValue131_asc&brand=peugeot&model%5B0%5D=308&year_from=2014&chassis%5B0%5D=2631&city_distance=0&showOldNew=all&without_price=1)');
+   
     // const result = await client.query('SELECT * FROM tasks');
     // const results = result ? result.rows : null;
     // console.log(results);
@@ -48,11 +50,11 @@ async function init() {
   } catch (err) {
     console.error(err);
   } finally {
-    const client = await pool.connect();
-    const result = await client.query('SELECT * FROM tasks');
-    const results = result ? result.rows : null;
-    console.log(results);
-    client.release();
+    // const client = await pool.connect();
+    // const result = await client.query('SELECT * FROM tasks');
+    // const results = result ? result.rows : null;
+    // console.log(results);
+    // client.release();
   }
 
   console.log("Launching browser...");
