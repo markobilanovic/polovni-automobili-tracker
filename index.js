@@ -62,6 +62,17 @@ async function getTasks() {
   }
 }
 
+async function updateTask(title, email, newIds) {
+  try {
+    const client = await pool.connect();
+    const query = `UPDATE tasks SET processedIds = processedIds || '{${newIds.join(",")}}' WHERE title = '${title}' AND email='${email}'`;
+    await client.query(query);
+    client.release();
+  } catch (err) {
+    console.error(err);
+  } 
+}
+
 
 let browser;
 let page;
@@ -99,8 +110,8 @@ async function start() {
       console.log("Process", title);
       const articles = await getNewArticles(url, processedids.map((id) => id.toString()));
       if (articles.length) {
-        await processArticles(articles, title, email)
-
+        await processArticles(articles, title, email);
+        await updateTask(title, email, articles.map((article) => article.id));
         // processedids.push(...articles.map((article) => article.id));
       }
     }
@@ -109,7 +120,7 @@ async function start() {
 
     setTimeout(() => {
       start();
-    }, 900 * 1000);
+    }, 2 * 60 * 1000);
 
   } catch (e) {
     console.log("Error!", e);
@@ -118,7 +129,7 @@ async function start() {
       await browser.close();
       setTimeout(() => {
         init();
-      }, 180 * 1000);
+      }, 30 * 1000);
     }
   }
   
