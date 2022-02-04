@@ -50,27 +50,23 @@ async function addNewTask(title, email, url) {
   } 
 }
 
-let browser;
-let page;
-
-async function init() {
-
+async function getTasks() {
   try {
     const client = await pool.connect();
     const result = await client.query('SELECT * FROM tasks');
     const results = result ? result.rows : null;
-    console.log(results);
     client.release();
+    return results;
   } catch (err) {
     console.error(err);
-  } finally {
-    // const client = await pool.connect();
-    // const result = await client.query('SELECT * FROM tasks');
-    // const results = result ? result.rows : null;
-    // console.log(results);
-    // client.release();
   }
+}
 
+
+let browser;
+let page;
+
+async function init() {
   console.log("Launching browser...");
   browser = await puppeteer.launch({
     headless: true,
@@ -95,21 +91,18 @@ async function init() {
 async function start() {
   try{
     console.log("Start script...");
-    let isDirty = false;
-  
-    for (const item of db) {    
-      const {title, url, processedIds} = item;
+
+    const tasks = await getTasks();
+
+    for (const task of tasks) {    
+      const {title, email, url, processedids} = task;
       console.log("Process", title);
-      const articles = await getNewArticles(url, processedIds.map((id) => id.toString()));
+      const articles = await getNewArticles(url, processedids.map((id) => id.toString()));
       if (articles.length) {
-        await processArticles(articles, title)
-        isDirty = true;
-        processedIds.push(...articles.map((article) => article.id));
+        await processArticles(articles, title, email)
+
+        // processedids.push(...articles.map((article) => article.id));
       }
-    }
-  
-    if (isDirty) {
-      await sendEmailOfDatabase(db);
     }
   
     console.log("Script ended!");
@@ -204,15 +197,15 @@ async function getArticleURL(articleElement) {
   return url;
 }
 
-async function processArticles(articles, title) {
+async function processArticles(articles, title, email) {
   const htmls = articles.map((article) => `<div>${article.innerHTML}</div>`);
   const html = htmls.join('<br/>');
   const dateStr = new Date().toLocaleTimeString('en-US');
-  await sendEmail(`Novi oglasi za: ${title} - ${dateStr}`, "", html);
+  await sendEmail(email, `Novi oglasi za: ${title} - ${dateStr}`, "", html);
 }
 
-async function sendEmail(subject, text, html) {
-  await mailService.sendEmail(["bilanovic90@gmail.com"], subject, text, html);
+async function sendEmail(to, subject, text, html) {
+  await mailService.sendEmail([to], subject, text, html);
 }
 
 async function sendEmailOfDatabase(db) {
