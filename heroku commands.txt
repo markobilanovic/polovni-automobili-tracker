@@ -1,12 +1,17 @@
+----------------------------------------------------------------------------------------
+********************        heruku setup for puppeteer     ****************************
+
 heroku buildpacks:clear
 heroku buildpacks:add --index 1 https://github.com/jontewks/puppeteer-heroku-buildpack
 heroku buildpacks:add --index 1 heroku/nodejs
 
 
+
+----------------------------------------------------------------------------------------
+*************************        heruku commands     ***********************************
+
 clean cache:    heroku builds:cache:purge -a fast-refuge-86416
-
-empty commit:   git commit --allow-empty -m "Purge cache"
-
+empty commit:   git commit --allow-empty -m "Empty commit"
 start app:      heroku ps:scale web=1
 stop app:       heroku ps:scale web=0
 log:            heroku logs -t 

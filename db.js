@@ -51,6 +51,19 @@ async function addNewTask(title, email, url) {
     } 
   }
 
+  async function clearProcessedIds() {
+    try {
+        const client = await pool.connect();
+        const query = `UPDATE tasks SET processedIds = '{}'`;
+        await client.query(query);
+        client.release();
+      } catch (err) {
+        console.error(err);
+      } 
+  }
+
+  clearProcessedIds();
+
   
 module.exports = {
     addNewTask: addNewTask,
