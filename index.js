@@ -109,6 +109,9 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         // fix url
         innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
 
+        // color promoted
+        innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
+
         articlesForProcessing.push({
           id: articleID,
           url,
