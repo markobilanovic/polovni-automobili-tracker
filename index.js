@@ -4,6 +4,13 @@ var express = require('express');
 var app = express();
 var path = require('path');
 const e = require('express');
+const { Pool } = require('pg');
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -14,22 +21,33 @@ app.listen(process.env.PORT || 4000, function () {
 });
 
 const db = [
-  {
-    title: "Peugeot 308",
-    url: "https://www.polovniautomobili.com/auto-oglasi/pretraga?sort=tagValue131_asc&brand=peugeot&model%5B0%5D=308&year_from=2014&chassis%5B0%5D=2631&city_distance=0&showOldNew=all&without_price=1",
-    processedIds: [17233908,19287264,19205256,19057223,19003948,19211277,18870469,19026066,19346544,19149596,19097082,19105309,19209758,19287352,19333957,19003429,19177440,19273419,19253453,18996225,19391752,19131221,19385096,19144553,18893666,19385925,18968267,19255390,19311205,19022643,18887838,19334929,18346398,18717994,19066347,19193278,19087121,18276110,18647045,18554121,19265513,18901645,19235122,18911876,19124257,19044880,19069892,19192073,19392240,19198074,19066492,19344599,19021606,18837905,18989317,19156237,19221410,16818142,19290995,18794874,18992344,19148558,18898978,18538061,18586402,18882864,19194424,19334047,18589843,18894827,19195457,18197763,19101766,18926789,17300050,19098275,19204524,19142998,18856843,19148932,18427693,19376012,18896882,18748978,18739852,19055385,18973693,19350075,17910977,18536880,19034619,19065693,19127397,19169768,18882870,19113454,17107112,19323999,18485555,18722493,19177174,19342891,19031725],
-  },
-  {
-    title: "Kia Ceed",
-    url: "https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=kia&model%5B%5D=ceed&brand2=&price_from=&price_to=&year_from=2014&year_to=&chassis%5B%5D=2631&flywheel=&atest=&door_num=&submit_1=&without_price=1&date_limit=&showOldNew=all&modeltxt=&engine_volume_from=&engine_volume_to=&power_from=&power_to=&mileage_from=&mileage_to=&emission_class=&seat_num=&wheel_side=&registration=&country=&country_origin=&city=&registration_price=&page=5&sort=tagValue131_asc",
-    processedIds: [17913644,16798194,18193609,18806012,18889149,18810398,18675209],
-  }
+  // {
+  //   title: "Peugeot 308",
+  //   url: "https://www.polovniautomobili.com/auto-oglasi/pretraga?sort=tagValue131_asc&brand=peugeot&model%5B0%5D=308&year_from=2014&chassis%5B0%5D=2631&city_distance=0&showOldNew=all&without_price=1",
+  //   processedIds: [17233908,19287264,19205256,19057223,19003948,19211277,18870469,19026066,19346544,19149596,19097082,19105309,19209758,19287352,19333957,19003429,19177440,19273419,19253453,18996225,19391752,19131221,19385096,19144553,18893666,19385925,18968267,19255390,19311205,19022643,18887838,19334929,18346398,18717994,19066347,19193278,19087121,18276110,18647045,18554121,19265513,18901645,19235122,18911876,19124257,19044880,19069892,19192073,19392240,19198074,19066492,19344599,19021606,18837905,18989317,19156237,19221410,16818142,19290995,18794874,18992344,19148558,18898978,18538061,18586402,18882864,19194424,19334047,18589843,18894827,19195457,18197763,19101766,18926789,17300050,19098275,19204524,19142998,18856843,19148932,18427693,19376012,18896882,18748978,18739852,19055385,18973693,19350075,17910977,18536880,19034619,19065693,19127397,19169768,18882870,19113454,17107112,19323999,18485555,18722493,19177174,19342891,19031725],
+  // },
+  // {
+  //   title: "Kia Ceed",
+  //   url: "https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=kia&model%5B%5D=ceed&brand2=&price_from=&price_to=&year_from=2014&year_to=&chassis%5B%5D=2631&flywheel=&atest=&door_num=&submit_1=&without_price=1&date_limit=&showOldNew=all&modeltxt=&engine_volume_from=&engine_volume_to=&power_from=&power_to=&mileage_from=&mileage_to=&emission_class=&seat_num=&wheel_side=&registration=&country=&country_origin=&city=&registration_price=&page=5&sort=tagValue131_asc",
+  //   processedIds: [17913644,16798194,18193609,18806012,18889149,18810398,18675209],
+  // }
 ];
 
 let browser;
 let page;
 
 async function init() {
+
+  try {
+    const client = await pool.connect();
+    const result = await client.query('SELECT * FROM tasks');
+    const results = result ? result.rows : null;
+    console.log(results);
+    client.release();
+  } catch (err) {
+    console.error(err);
+  }
+
   console.log("Launching browser...");
   browser = await puppeteer.launch({
     headless: true,
@@ -40,23 +58,11 @@ async function init() {
   await page.setRequestInterception(true);
   page.on('request', (req) => {
     const resourceType = req.resourceType();
-
     if (resourceType !== "document") {
       req.abort();
     } else {
       req.continue();
     }
-
-    // if (resourceType === 'image' ||
-    //     resourceType === 'font' ||
-    //     resourceType === 'stylesheet')
-    // {
-    //   req.abort();
-    // }
-    // else 
-    // {
-    //   req.continue();
-    // }
   });
   console.log("Browser initialized!");
   
@@ -107,18 +113,14 @@ async function getNewArticles(baseURL, processedIds) {
   await page.goto(baseURL);
 
   // process first page
-  console.log(`Processing page: 1`);
   articles.push(...await processPage(baseURL, processedIds, false));
-  console.log(`Page 1 done!`);
 
   // process rest of the pages
   const pagesCount = await getPagesCount();
   if (pagesCount > 1) {
     for (let i = 2; i <= pagesCount; i++) {
       const url = baseURL + "&page=" + i;
-      console.log(`Processing page: ${i}`);
       articles.push(...await processPage(url, processedIds));
-      console.log(`Page ${i} done!`);
     }
   }
 
