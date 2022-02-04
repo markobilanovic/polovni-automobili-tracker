@@ -13,6 +13,7 @@ app.get('/', (req, res) => {
 app.post('/addRecord', (req, res) => {
   const {title, email, url} = req.body;
   db.addNewTask(title, email, url);
+  res.sendStatus(204);
 });
 
 

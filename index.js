@@ -2,10 +2,11 @@ require('./controller');
 const puppeteer = require('puppeteer');
 const mailService = require('./mailService');
 const db = require('./db');
+const utils = require('./utils');
 
 let browser;
 let page;
-
+let date;
 
 async function init() {
   console.log("Launching browser...");
@@ -30,6 +31,7 @@ async function init() {
 async function start() {
   try{
     console.log("Start script...");
+    date = utils.getCurrentDate();
     const tasks = await db.getTasks();
     for (const task of tasks) {    
       const {title, email, url, processedids} = task;
@@ -134,8 +136,7 @@ async function getArticleURL(articleElement) {
 async function processArticles(articles, title, email) {
   const htmls = articles.map((article) => `<div>${article.innerHTML}</div>`);
   const html = htmls.join('<br/>');
-  const dateStr = new Date().toLocaleTimeString('en-US');
-  await sendEmail(email, `Novi oglasi za: ${title} - ${dateStr}`, "", html);
+  await sendEmail(email, `Novi oglasi za: ${title} - ${date}`, "", html);
 }
 
 async function sendEmail(to, subject, text, html) {
@@ -152,3 +153,4 @@ async function getPagesCount() {
 }
 
 init();
+
