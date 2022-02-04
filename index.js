@@ -1,26 +1,10 @@
+require('./controller');
 const puppeteer = require('puppeteer');
 const mailService = require('./mailService');
 const db = require('./db');
-var express = require('express');
-var app = express();
-var path = require('path');
+
 let browser;
 let page;
-
-
-app.get('/', function (req, res) {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.post('/addRecord', (req, res) {
-  const {title, email, url} = req.body;
-  await db.addNewTask(title, email, url);
-});
-
-
-
-app.listen(process.env.PORT || 4000, () => console.log('Node app is working!'));
-
 
 
 async function init() {
