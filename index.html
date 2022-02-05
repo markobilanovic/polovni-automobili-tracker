@@ -1,4 +1,41 @@
-<form action="/addRecord" method="POST">
+
+<html>
+
+<head>
+    <script>
+        function resetForm() {
+            var title = document.getElementById("title").value;
+            var email = document.getElementById("email").value;
+            var url = document.getElementById("url").value;
+
+            if (!title || !email || !url) {
+                return;
+            }
+            
+
+            const data = {
+                title,
+                email,
+                url,
+            }
+
+            fetch("/addRecord", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(data)
+            })
+            .then((res) => {
+                var form = document.getElementById("addRecordForm");
+                form.reset();
+                console.log("Request complete! response:", res);
+                alert("Added!", res);
+            });
+        }
+    </script>
+</head>
+
+<body>
+<form id="addRecordForm" action="javascript:resetForm()">
     <fieldset>
       <h3>Add new tracking record</h3>
 
@@ -14,6 +51,12 @@
       <input type="text" id="url" name="url" required>
       <br><br>
 
-      <button type="submit">Submit</button>
+      <button type="submit"
+        >
+        Submit
+    </button>
     </fieldset>
   </form>
+
+</body>
+</html>

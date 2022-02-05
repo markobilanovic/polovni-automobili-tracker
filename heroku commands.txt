@@ -15,3 +15,13 @@ empty commit:   git commit --allow-empty -m "Empty commit"
 start app:      heroku ps:scale web=1
 stop app:       heroku ps:scale web=0
 log:            heroku logs -t 
+
+
+
+----------------------------------------------------------------------------------------
+*************************        keep heroku app live     ***********************************
+
+http://kaffeine.herokuapp.com/
+
+
+----------------------------------------------------------------------------------------

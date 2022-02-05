@@ -15,7 +15,7 @@ app.post('/addRecord', (req, res) => {
     console.log(req.body);
   const {title, email, url} = req.body;
 //   db.addNewTask(title, email, url);
-    res.sendStatus(200);
+    res.sendStatus(204);
 });
 
 
@@ -101,12 +101,12 @@ async function getNewArticles(baseURL, processedIds) {
           innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
 
         // fix url
-        innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
+        innerHTML = innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
 
         // color promoted
         innerHTML = innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
 
-        console.log(innerHTML);
+  console.log(innerHTML);
           articlesForProcessing.push({
             id: articleID,
             url,
