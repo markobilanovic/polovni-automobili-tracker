@@ -62,7 +62,7 @@ async function addNewTask(title, email, url) {
       } 
   }
 
-//   clearProcessedIds();
+  clearProcessedIds();
   
 module.exports = {
     addNewTask: addNewTask,
