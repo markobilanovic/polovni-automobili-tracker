@@ -91,8 +91,9 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         continue;
       }
 
+      const articleIDString = articleID.toString();
       console.log(processedIds, articleID);
-      if (processedIds.indexOf(articleID) !== -1) { 
+      if (processedIds.indexOf(articleIDString) !== -1) { 
         continue;
       }
 
