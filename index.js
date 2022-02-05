@@ -99,14 +99,14 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         
         
         // // attach image
-        innerHTML = innerHTML.replace("data-src=", "src=");
+        // innerHTML = innerHTML.replace("data-src=", "src=");
         
-        // //get image url
-        // const index = innerHTML.indexOf("data-src=");
-        // const parts = innerHTML.substring(index).split("\"");
-        // const imageURL = parts[1];
-        // // attach image
-        // innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
+        //get image url
+        const index = innerHTML.indexOf("data-src=");
+        const parts = innerHTML.substring(index).split("\"");
+        const imageURL = parts[1];
+        // attach image
+        innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
 
         // fix url
         innerHTML = innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
