@@ -16,7 +16,7 @@ app.post('/addRecord', (req, res) => {
   res.sendStatus(204);
 });
 
-app.get('/addRecord', (req, res) => {
+app.get('/clear', (req, res) => {
   db.clearProcessedIds(title, email, url);
   res.sendStatus(204);
 });
