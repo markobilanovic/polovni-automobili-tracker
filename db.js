@@ -66,4 +66,5 @@ module.exports = {
     addNewTask: addNewTask,
     updateTask: updateTask,
     getTasks: getTasks,
+    clearProcessedIds: clearProcessedIds,
 }

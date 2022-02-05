@@ -17,7 +17,7 @@ app.post('/addRecord', (req, res) => {
 });
 
 app.get('/clear', (req, res) => {
-  db.clearProcessedIds(title, email, url);
+  db.clearProcessedIds();
   res.sendStatus(204);
 });
 
