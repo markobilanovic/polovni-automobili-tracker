@@ -35,7 +35,7 @@ async function start() {
     const tasks = await db.getTasks();
     for (const task of tasks) {    
       const {title, email, url, processedids} = task;
-      console.log("Process", title);
+      console.log("Process", title, email, processedids.length);
       const articles = await getNewArticles(url, processedids.map((id) => id.toString()));
       if (articles.length) {
         await processArticles(articles, title, email);
