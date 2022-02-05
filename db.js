@@ -57,6 +57,7 @@ async function addNewTask(title, email, url) {
         const query = `UPDATE tasks SET processedids = '{}'`;
         await client.query(query);
         client.release();
+        console.log("Processed IDs - cleared");
       } catch (err) {
         console.error(err);
       } 
