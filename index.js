@@ -118,7 +118,7 @@ async function processPage(url, processedIds, loadPageFirst = true) {
 
 
       articlesForProcessing.push({
-        id: articleID,
+        id: Number(articleID),
         url,
         innerHTML,
       });
