@@ -85,6 +85,7 @@ async function processPage(url, processedIds, loadPageFirst = true) {
     await page.goto(url);
   }
   const articles = await page.$$("article");
+  let newIndex = 0;
   for (let article of articles) {
     const articleID = await page.evaluate(el => el.getAttribute("data-classifiedid"), article);
     if (!articleID) {
@@ -94,6 +95,7 @@ async function processPage(url, processedIds, loadPageFirst = true) {
     if (processedIds.indexOf(articleID) !== -1) {
       continue;
     }
+    newIndex++;
 
     const url = await getArticleURL(article);
     const innerHTMLElement = await article.getProperty("outerHTML");
@@ -128,6 +130,7 @@ async function processPage(url, processedIds, loadPageFirst = true) {
     })
 
     const articleHTML = `<div>
+        <div>${newIndex}</div>
         <a href="${articleURL}">
           <img src="${imageURL}" />
         </a>
@@ -167,7 +170,7 @@ async function getArticleURL(articleElement) {
 async function processArticles(articles, title, email) {
   const htmls = articles.map((article) => `<div>${article.innerHTML}</div>`);
   const html = htmls.join('<br/>');
-  await mailService.sendEmail([email], `Novi oglasi za: ${title} - ${date}`, "", html);
+  await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", html);
 }
 
 async function getPagesCount() {
