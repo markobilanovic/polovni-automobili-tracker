@@ -93,12 +93,12 @@ async function processPage(url, processedIds, loadPageFirst = true) {
 
       if (processedIds.indexOf(articleID) === -1) { // ako nije obradjen
         const url = await getArticleURL(article);
-        const innerHTMLElement = await article.getProperty("innerHTML");
+        const innerHTMLElement = await article.getProperty("outerHTML");
         
         let innerHTML = await innerHTMLElement.jsonValue();
         
         //get image url
-        innerHTML.replace("data-src=", "src=");
+        innerHTML = innerHTML.replace("data-src=", "src=");
         const index = innerHTML.indexOf("data-src=");
         const parts = innerHTML.substring(index).split("\"");
         const imageURL = parts[1];
@@ -107,10 +107,11 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
 
         // fix url
-        innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
+        innerHTML = innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
 
         // color promoted
-        innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
+        innerHTML = innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
+
 
         articlesForProcessing.push({
           id: articleID,

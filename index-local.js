@@ -89,10 +89,10 @@ async function getNewArticles(baseURL, processedIds) {
           
           let innerHTML = await innerHTMLElement.jsonValue();
 
-          console.log(innerHTML);
+          
           
           //get image url
-          innerHTML.replace("data-src=", "src=");
+          innerHTML = innerHTML.replace("data-src=", "src=");
           const index = innerHTML.indexOf("data-src=");
           const parts = innerHTML.substring(index).split("\"");
           const imageURL = parts[1];
@@ -100,10 +100,13 @@ async function getNewArticles(baseURL, processedIds) {
           // attach image
           innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
 
-          // fix url
-          innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
+        // fix url
+        innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
 
-  
+        // color promoted
+        innerHTML = innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
+
+        console.log(innerHTML);
           articlesForProcessing.push({
             id: articleID,
             url,
