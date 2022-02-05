@@ -21,7 +21,7 @@ const pool = new Pool({
 async function addNewTask(title, email, url) {
     try {
       const client = await pool.connect();
-      await client.query(`insert into tasks (title, email, url, processedIds) values ('${title}', '${email}', '${url}', '{}')`);
+      await client.query(`insert into tasks (title, email, url, processedids) values ('${title}', '${email}', '${url}', '{}')`);
       client.release();
     } catch (err) {
       console.error(err);
@@ -43,7 +43,7 @@ async function addNewTask(title, email, url) {
   async function updateTask(title, email, newIds) {
     try {
       const client = await pool.connect();
-      const query = `UPDATE tasks SET processedIds = processedIds || '{${newIds.join(",")}}' WHERE title = '${title}' AND email='${email}'`;
+      const query = `UPDATE tasks SET processedids = processedids || '{${newIds.join(",")}}' WHERE title = '${title}' AND email='${email}'`;
       await client.query(query);
       client.release();
     } catch (err) {
@@ -54,7 +54,7 @@ async function addNewTask(title, email, url) {
   async function clearProcessedIds() {
     try {
         const client = await pool.connect();
-        const query = `UPDATE tasks SET processedIds = '{}'`;
+        const query = `UPDATE tasks SET processedids = '{}'`;
         await client.query(query);
         client.release();
       } catch (err) {
@@ -62,8 +62,6 @@ async function addNewTask(title, email, url) {
       } 
   }
 
-  clearProcessedIds();
-  
 module.exports = {
     addNewTask: addNewTask,
     updateTask: updateTask,

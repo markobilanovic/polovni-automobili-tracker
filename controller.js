@@ -16,5 +16,9 @@ app.post('/addRecord', (req, res) => {
   res.sendStatus(204);
 });
 
+app.get('/addRecord', (req, res) => {
+  db.clearProcessedIds(title, email, url);
+  res.sendStatus(204);
+});
 
 app.listen(process.env.PORT || 4000, () => console.log('Node app is working!'));
