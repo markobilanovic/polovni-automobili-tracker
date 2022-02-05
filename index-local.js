@@ -5,7 +5,6 @@ const utils = require('./utils');
 const puppeteer = require('puppeteer');
 
 app.use(express.json());       // to support JSON-encoded bodies
-app.use(express.urlencoded()); // to support URL-encoded bodies
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -63,13 +62,13 @@ async function getNewArticles(baseURL, processedIds) {
     articles.push(...await processPage(baseURL, processedIds, false));
   
     // process rest of the pages
-    const pagesCount = await getPagesCount();
-    if (pagesCount > 1) {
-      for (let i = 2; i <= pagesCount; i++) {
-        const url = baseURL + "&page=" + i;
-        articles.push(...await processPage(url, processedIds));
-      }
-    }
+    // const pagesCount = await getPagesCount();
+    // if (pagesCount > 1) {
+    //   for (let i = 2; i <= pagesCount; i++) {
+    //     const url = baseURL + "&page=" + i;
+    //     articles.push(...await processPage(url, processedIds));
+    //   }
+    // }
   
     return articles;
   }
@@ -80,7 +79,12 @@ async function getNewArticles(baseURL, processedIds) {
       await page.goto(url);
     }
     const articles = await page.$$("article");
+    let i = 0;
     for (let article of articles) {
+      if (i > 0) {
+        continue;
+      }
+        i++;
         const articleID = await page.evaluate(el => el.getAttribute("data-classifiedid"), article);
         if (!articleID) {
           continue;
@@ -89,35 +93,66 @@ async function getNewArticles(baseURL, processedIds) {
         if (processedIds.indexOf(articleID) === -1) { // ako nije obradjen
           const url = await getArticleURL(article);
           const innerHTMLElement = await article.getProperty("outerHTML");
-          
           let innerHTML = await innerHTMLElement.jsonValue();
 
-          
-          
-          //get image url
-          innerHTML = innerHTML.replace("data-src=", "src=");
-          const index = innerHTML.indexOf("data-src=");
-          const parts = innerHTML.substring(index).split("\"");
-          const imageURL = parts[1];
-  
-          // attach image
-          innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
 
-        // fix url
-        innerHTML = innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
+        // cena 
+        const [cena] = await article.$$eval('.price', (options) =>
+          options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
+        );
 
-        // color promoted
-        innerHTML = innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
+        // image URL
+         let index = innerHTML.indexOf("data-src=");
+         let parts = innerHTML.substring(index).split("\"");
+        const imageURL = parts[1];
 
+        // Article URL
+        index = innerHTML.indexOf("/auto-oglasi/");
+        parts = innerHTML.substring(index).split("\"");
+        const articleURL = "https://www.polovniautomobili.com" + parts[0];
         
+        const setInfo = await article.$$eval('.setInfo', (options) =>
+        options.map((option) => option.textContent.replaceAll("\t", "").split("\n"))
+      );
+        
+        const infos = [];
+        setInfo.forEach((info) => {
+          info.forEach((i) => {
+            if(i) {
+              infos.push(i);
+            }
+          });
+        })
+
+        const articleHTML = `<div>
+          <a href="${articleURL}">
+            <img src="${imageURL}" />
+          </a>
+          <div>
+            <div>${cena}</div>
+            ${infos.map((info) => `<div>${info}</div>`).join('')}
+          </div>
+        </div>`;
+
+
           articlesForProcessing.push({
             id: articleID,
             url,
-            innerHTML,
+            articleHTML,
           });
         }
     }
     return articlesForProcessing;
+  }
+
+  async function removeElementFromDOM(element, selector) {
+    // element.querySelector(selector)?.remove();
+    console.log(element, selector);
+    let textMessage = await element.$eval(selector, (e) => { 
+      console.log(e);
+      return e.innerText.trim();
+    });
+    
   }
   
   async function getArticleURL(articleElement) {

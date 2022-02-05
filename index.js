@@ -12,7 +12,7 @@ async function init() {
   console.log("Launching browser...");
   browser = await puppeteer.launch({
     headless: true,
-    args : ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   page = await browser.newPage();
   page.setDefaultNavigationTimeout(120 * 1000);
@@ -29,12 +29,12 @@ async function init() {
 }
 
 async function start() {
-  try{
+  try {
     console.log("Start script...");
     date = utils.getCurrentDate();
     const tasks = await db.getTasks();
-    for (const task of tasks) {    
-      const {title, email, url, processedids} = task;
+    for (const task of tasks) {
+      const { title, email, url, processedids } = task;
       console.log("Process", title, email, processedids.length);
       const articles = await getNewArticles(url, processedids.map((id) => id.toString()));
       if (articles.length) {
@@ -42,7 +42,7 @@ async function start() {
         await db.updateTask(title, email, articles.map((article) => article.id));
       }
     }
-  
+
     console.log("Script ended!");
     setTimeout(() => {
       start();
@@ -57,7 +57,7 @@ async function start() {
       }, 2 * 60 * 1000);
     }
   }
-  
+
 }
 
 async function getNewArticles(baseURL, processedIds) {
@@ -86,42 +86,63 @@ async function processPage(url, processedIds, loadPageFirst = true) {
   }
   const articles = await page.$$("article");
   for (let article of articles) {
-      const articleID = await page.evaluate(el => el.getAttribute("data-classifiedid"), article);
-      if (!articleID) {
-        continue;
-      }
+    const articleID = await page.evaluate(el => el.getAttribute("data-classifiedid"), article);
+    if (!articleID) {
+      continue;
+    }
 
-      const articleIDString = articleID.toString();
-      if (processedIds.indexOf(articleIDString) !== -1) { 
-        continue;
-      }
+    if (processedIds.indexOf(articleID) !== -1) {
+      continue;
+    }
 
-      const url = await getArticleURL(article);
-      const innerHTMLElement = await article.getProperty("outerHTML");
-      
-      let innerHTML = await innerHTMLElement.jsonValue();
-      
-      // innerHTML.replace("data-src=", "src=");
-      
-      //get image url
-      const index = innerHTML.indexOf("data-src=");
-      const parts = innerHTML.substring(index).split("\"");
-      const imageURL = parts[1];
-      // attach image
-      innerHTML = `<br/><img href="${imageURL}" src="${imageURL}"></img>`.concat(innerHTML).concat("<br/><br/><br/>");
+    const url = await getArticleURL(article);
+    const innerHTMLElement = await article.getProperty("outerHTML");
+    let innerHTML = await innerHTMLElement.jsonValue();
 
-      // fix url
-      innerHTML = innerHTML.replace("/auto-oglasi/", "https://www.polovniautomobili.com/auto-oglasi/");
+    // cena 
+    const [cena] = await article.$$eval('.price', (options) =>
+      options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
+    );
 
-      // color promoted
-      innerHTML = innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
+    // image URL
+    let index = innerHTML.indexOf("data-src=");
+    let parts = innerHTML.substring(index).split("\"");
+    const imageURL = parts[1];
 
+    // Article URL
+    index = innerHTML.indexOf("/auto-oglasi/");
+    parts = innerHTML.substring(index).split("\"");
+    const articleURL = "https://www.polovniautomobili.com" + parts[0];
 
-      articlesForProcessing.push({
-        id: Number(articleID),
-        url,
-        innerHTML,
+    const setInfo = await article.$$eval('.setInfo', (options) =>
+      options.map((option) => option.textContent.replaceAll("\t", "").split("\n"))
+    );
+
+    const infos = [];
+    setInfo.forEach((info) => {
+      info.forEach((i) => {
+        if (i) {
+          infos.push(i);
+        }
       });
+    })
+
+    const articleHTML = `<div>
+        <a href="${articleURL}">
+          <img src="${imageURL}" />
+        </a>
+        <div>
+          <div>${cena}</div>
+          ${infos.map((info) => `<div>${info}</div>`).join('')}
+        </div>
+      </div>`;
+
+
+    articlesForProcessing.push({
+      id: articleID,
+      url,
+      articleHTML,
+    });
   }
   return articlesForProcessing;
 }
