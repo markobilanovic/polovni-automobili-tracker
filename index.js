@@ -91,6 +91,7 @@ async function processPage(url, processedIds, loadPageFirst = true) {
         continue;
       }
 
+      console.log(processedIds, articleID);
       if (processedIds.indexOf(articleID) !== -1) { 
         continue;
       }

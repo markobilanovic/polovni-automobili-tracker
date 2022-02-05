@@ -109,7 +109,7 @@ async function getNewArticles(baseURL, processedIds) {
         // color promoted
         innerHTML = innerHTML.replace("usedCarFeatured\"", "usedCarFeatured\" style=\"background: #a9373722;\"");
 
-  console.log(innerHTML);
+        
           articlesForProcessing.push({
             id: articleID,
             url,
