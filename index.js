@@ -168,7 +168,7 @@ async function getArticleURL(articleElement) {
 }
 
 async function processArticles(articles, title, email) {
-  const htmls = articles.map((article) => `<div>${article.innerHTML}</div>`);
+  const htmls = articles.map((article) => `<div>${article.articleHTML}</div>`);
   const html = htmls.join('<br/>');
   await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", html);
 }
