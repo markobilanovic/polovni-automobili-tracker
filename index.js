@@ -85,7 +85,6 @@ async function processPage(url, processedIds, loadPageFirst = true) {
     await page.goto(url);
   }
   const articles = await page.$$("article");
-  let newIndex = 0;
   for (let article of articles) {
     const articleID = await page.evaluate(el => el.getAttribute("data-classifiedid"), article);
     if (!articleID) {
@@ -95,14 +94,18 @@ async function processPage(url, processedIds, loadPageFirst = true) {
     if (processedIds.indexOf(articleID) !== -1) {
       continue;
     }
-    newIndex++;
 
     const url = await getArticleURL(article);
     const innerHTMLElement = await article.getProperty("outerHTML");
     let innerHTML = await innerHTMLElement.jsonValue();
 
-    // cena 
-    const [cena] = await article.$$eval('.price', (options) =>
+    // article title
+    const [title] = await article.$$eval('h2 > a', (options) =>
+    options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
+  );
+
+    // price 
+    const [price] = await article.$$eval('.price', (options) =>
       options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
     );
 
@@ -116,27 +119,47 @@ async function processPage(url, processedIds, loadPageFirst = true) {
     parts = innerHTML.substring(index).split("\"");
     const articleURL = "https://www.polovniautomobili.com" + parts[0];
 
+    // city
+    const [city] = await article.$$eval('.city', (options) =>
+      options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
+    );
+
+    // other info
     const setInfo = await article.$$eval('.setInfo', (options) =>
       options.map((option) => option.textContent.replaceAll("\t", "").split("\n"))
     );
 
-    const infos = [];
+    let kubikaza = "";
+    let kilometraza = "";
+    let konjskihSnaga = "";
+    let godiste = "";
+
     setInfo.forEach((info) => {
-      info.forEach((i) => {
-        if (i) {
-          infos.push(i);
+      godiste = info[0];;
+      info.forEach((val) => {
+        if (val.indexOf(" cm3") !== -1) {
+          kubikaza = val;
+        } else if (val.indexOf(" km") !== -1) {
+          kilometraza = val;
+        } else if (val.indexOf("KS)") !== -1) {
+          konjskihSnaga = val;
         }
+
       });
     })
 
     const articleHTML = `<div>
-        <div>${newIndex}</div>
+        <h2>${title}</h2>
         <a href="${articleURL}">
           <img src="${imageURL}" />
         </a>
         <div>
-          <div>${cena}</div>
-          ${infos.map((info) => `<div>${info}</div>`).join('')}
+          <h3>${price}</h3>
+          <h3>${godiste}</h3>
+          <h3>${kilometraza}</h3>
+          <div>${city}</div>
+          <br/>
+          <div>${kubikaza}, ${konjskihSnaga}</div>
         </div>
       </div>`;
 
@@ -168,7 +191,12 @@ async function getArticleURL(articleElement) {
 }
 
 async function processArticles(articles, title, email) {
-  const htmls = articles.map((article) => `<div>${article.articleHTML}</div>`);
+  const htmls = articles.map((article, index) => {
+    return `<div>
+      <div>${index}</div>
+      ${article.articleHTML}
+    </div>`;
+  });
   const html = htmls.join('<br/>');
   await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", html);
 }
