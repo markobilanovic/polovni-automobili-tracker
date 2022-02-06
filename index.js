@@ -191,9 +191,8 @@ async function getArticleURL(articleElement) {
 }
 
 async function processArticles(articles, title, email) {
-  const htmls = articles.map((article, index) => {
+  const htmls = articles.map((article) => {
     return `<div>
-      <div>${index}</div>
       ${article.articleHTML}
     </div>`;
   });
