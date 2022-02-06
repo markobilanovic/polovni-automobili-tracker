@@ -174,7 +174,7 @@ async function processArticles(articles, title, email) {
 }
 
 async function getPagesCount() {
-  const [totalItemsDiv] = await page.$x("//small[contains(., 'Prikazano od')]");
+  const [totalItemsDiv] = await page.$("//small[contains(., 'Prikazano od')]");
   const totalItemsString = await page.evaluate(el => el.textContent, totalItemsDiv);
   const totalItemsParts = totalItemsString.split(' ');
   const itemsLength = Number(totalItemsParts[totalItemsParts.length - 1]);
