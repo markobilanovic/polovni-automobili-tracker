@@ -63,9 +63,20 @@ async function addNewTask(title, email, url) {
       } 
   }
 
+  async function executeQuery(query) {
+    try {
+        const client = await pool.connect();
+        await client.query(query);
+        client.release();
+      } catch (err) {
+        console.error(err);
+      } 
+  }
+
 module.exports = {
     addNewTask: addNewTask,
     updateTask: updateTask,
     getTasks: getTasks,
     clearProcessedIds: clearProcessedIds,
+    executeQuery: executeQuery,
 }

@@ -1,0 +1,39 @@
+<html>
+<head>
+    <script>
+        function executeQuery() {
+            var query = document.getElementById("query").value;
+            if (!query) {
+                return;
+            }
+
+            fetch("/executeQuery", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(query)
+            })
+            .then((res) => {
+                var form = document.getElementById("queryForm");
+                form.reset();
+                console.log("Request complete! response:", res);
+                alert("Executed!", res);
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <form id="queryForm" action="javascript:executeQuery()">
+        <fieldset>
+        <label>Query</label>
+        <input type="text" id='query' name="query" required>
+        <br><br>
+
+        <button type="submit">
+            Execute Query
+        </button>
+        </fieldset>
+    </form>
+
+</body>
+</html>

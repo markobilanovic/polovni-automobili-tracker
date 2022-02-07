@@ -10,6 +10,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/db', (req, res) => {
+  res.sendFile(path.join(__dirname, 'db.html'));
+});
+
 app.post('/addRecord', (req, res) => {
   const {title, email, url} = req.body;
   db.addNewTask(title, email, url);
@@ -19,6 +23,12 @@ app.post('/addRecord', (req, res) => {
 
 app.get('/clear', (req, res) => {
   db.clearProcessedIds();
+  res.sendStatus(204);
+});
+
+app.get('/executeQuery', (req, res) => {
+  const {query} = req.body;
+  db.executeQuery(query);
   res.sendStatus(204);
 });
 
