@@ -27,8 +27,9 @@ async function runScript() {
     setTimeout(() => runScript(), 15 * 60 * 1000);
   } catch (e) {
     console.log("Error!", e);
-    if (puppeteerManager.browser) {
-      await puppeteerManager.browser.close();
+    const browser = puppeteerManager.getBrowser();
+    if (browser) {
+      await browser.close();
       setTimeout(() => startApplication(), 2 * 60 * 1000);
     }
   }

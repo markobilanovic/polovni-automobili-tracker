@@ -25,8 +25,12 @@ function getPage() {
     return page;
 }
 
+function getBrowser() {
+    return browser;
+}
+
 module.exports = {
     initPuppeteer: initPuppeteer,
     getPage: getPage,
-    browser: browser,
+    getBrowser: getBrowser,
 }
