@@ -1,10 +1,10 @@
-import { getPage } from '../../puppeteerManager';
+const puppeteerManager = require('../../puppeteerManager');
 
 let page;
 
 async function scrapeURL(baseURL, processedIds) {
     let articles = [];
-    page = getPage();
+    page = puppeteerManager.getPage();
     await page.goto(baseURL);
 
     // process first page

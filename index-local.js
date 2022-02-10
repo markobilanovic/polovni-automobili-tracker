@@ -3,8 +3,8 @@ const puppeteerManager = require('./puppeteerManager');
 // const mailService = require('./mailService');
 // const db = require('./db');
 const utils = require('./utils');
-const scraper = require('./scraper');
-const emailBuilder = require('./emailBuilder');
+const scraper = require('./scrapers/PolovniAutomobili/scraper');
+const emailBuilder = require('./scrapers/PolovniAutomobili/emailBuilder');
 
 let date;
 
