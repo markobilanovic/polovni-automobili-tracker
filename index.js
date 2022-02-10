@@ -39,16 +39,16 @@ async function runScript() {
       }
     }
 
-    const garaze = await db.getGaraze();
-    for (const garaza of garaze) {
-      const { title, email, url, ids } = garaza;
-      const articles = await scraperGaraze.scrapeURL(url, ids.map((id) => id.toString()));
-      if (articles.length) {
-        const emailBody = emailBuilderGaraze.getEmailBody(articles);
-        await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", emailBody);
-        await db.updateGaraze(title, email, articles.map((article) => article.id));
-      }
-    }
+    // const garaze = await db.getGaraze();
+    // for (const garaza of garaze) {
+    //   const { title, email, url, ids } = garaza;
+    //   const articles = await scraperGaraze.scrapeURL(url, ids.map((id) => id.toString()));
+    //   if (articles.length) {
+    //     const emailBody = emailBuilderGaraze.getEmailBody(articles);
+    //     await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", emailBody);
+    //     await db.updateGaraze(title, email, articles.map((article) => article.id));
+    //   }
+    // }
 
     console.log("Finish");
     setTimeout(() => runScript(), 15 * 60 * 1000);

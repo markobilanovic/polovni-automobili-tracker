@@ -1,4 +1,4 @@
-const puppeteerManager = require('../../puppeteerManager');
+import { getPage } from '../../puppeteerManager';
 
 let page;
 

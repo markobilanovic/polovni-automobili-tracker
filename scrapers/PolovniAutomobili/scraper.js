@@ -1,10 +1,10 @@
-const puppeteerManager = require('./puppeteerManager');
+import { getPage } from '../../puppeteerManager';
 
 let page;
 
 async function scrapeURL(baseURL, processedIds) {
     let articles = [];
-    page = puppeteerManager.getPage();
+    page = getPage();
     await page.goto(baseURL);
 
     // process first page
@@ -131,6 +131,4 @@ async function getPagesCount() {
 }
 
 
-module.exports = {
-    scrapeURL: scrapeURL,
-}
+export const scrapeURL = scrapeURL;
