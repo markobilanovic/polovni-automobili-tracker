@@ -3,8 +3,11 @@ const puppeteerManager = require('./puppeteerManager');
 const mailService = require('./mailService');
 const db = require('./db');
 const utils = require('./utils');
-const scraper = require('./scraper');
-const emailBuilder = require('./emailBuilder');
+const scraperAutomobili = require('./scrapers/PolovniAutomobili/scraper');
+const emailBuilderAutomobili = require('./scrapers/PolovniAutomobili/emailBuilder');
+const scraperZida4 = require('./scrapers/Zida4/scraper');
+const emailBuilderZida4 = require('./scrapers/Zida4/emailBuilder');
+
 
 let date;
 
@@ -12,16 +15,28 @@ async function runScript() {
   try {
     date = utils.getCurrentDate();
     console.log("Started...", date);
-    const tasks = await db.getTasks();
-    for (const task of tasks) {
-      const { title, email, url, processedids } = task;
-      const articles = await scraper.scrapeURL(url, processedids.map((id) => id.toString()));
+    const automobili = await db.getAutomobili();
+    for (const automobil of automobili) {
+      const { title, email, url, ids } = automobil;
+      const articles = await scraperAutomobili.scrapeURL(url, ids.map((id) => id.toString()));
       if (articles.length) {
-        const emailBody = emailBuilder.getEmailBody(articles);
+        const emailBody = emailBuilderAutomobili.getEmailBody(articles);
         await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", emailBody);
-        await db.updateTask(title, email, articles.map((article) => article.id));
+        await db.updateAutomobil(title, email, articles.map((article) => article.id));
       }
     }
+
+    const stanovi = await db.getZida4();
+    for (const stan of stanovi) {
+      const { title, email, url, ids } = stan;
+      const articles = await scraperZida4.scrapeURL(url, ids.map((id) => id.toString()));
+      if (articles.length) {
+        const emailBody = emailBuilderZida4.getEmailBody(articles);
+        await mailService.sendEmail([email], `${title} - Count: ${articles.length} - ${date}`, "", emailBody);
+        await db.updateZida4(title, email, articles.map((article) => article.id));
+      }
+    }
+
 
     console.log("Finish");
     setTimeout(() => runScript(), 15 * 60 * 1000);

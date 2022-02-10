@@ -18,20 +18,23 @@ const pool = new Pool({
 
 //DELETE FROM table_name WHERE condition;
 
+const tableNameAutomobili = "polovni_automobili";
+const tableNameZida4 = "zida4";
+
 async function addNewTask(title, email, url) {
     try {
       const client = await pool.connect();
-      await client.query(`insert into tasks (title, email, url, processedids) values ('${title}', '${email}', '${url}', '{}')`);
+      await client.query(`insert into ${tableNameAutomobili} (title, email, url, ids) values ('${title}', '${email}', '${url}', '{}')`);
       client.release();
     } catch (err) {
       console.error(err);
     } 
   }
   
-  async function getTasks() {
+  async function getAutomobili() {
     try {
       const client = await pool.connect();
-      const result = await client.query('SELECT * FROM tasks');
+      const result = await client.query(`SELECT * FROM ${tableNameAutomobili}`);
       const results = result ? result.rows : null;
       client.release();
       return results;
@@ -40,10 +43,10 @@ async function addNewTask(title, email, url) {
     }
   }
   
-  async function updateTask(title, email, newIds) {
+  async function updateAutomobil(title, email, newIds) {
     try {
       const client = await pool.connect();
-      const query = `UPDATE tasks SET processedids = processedids || '{${newIds.join(",")}}' WHERE title = '${title}' AND email='${email}'`;
+      const query = `UPDATE ${tableNameAutomobili} SET ids = ids || '{${newIds.join(",")}}' WHERE title = '${title}' AND email='${email}'`;
       await client.query(query);
       client.release();
     } catch (err) {
@@ -51,10 +54,33 @@ async function addNewTask(title, email, url) {
     } 
   }
 
-  async function clearProcessedIds() {
+  async function getZida4() {
+    try {
+      const client = await pool.connect();
+      const result = await client.query(`SELECT * FROM zida4`);
+      const results = result ? result.rows : null;
+      client.release();
+      return results;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function updateZida4(title, email, newIds) {
+    try {
+      const client = await pool.connect();
+      const query = `UPDATE zida4 SET ids = ids || '{${newIds.join(",")}}' WHERE title = '4 Zida'`;
+      await client.query(query);
+      client.release();
+    } catch (err) {
+      console.error(err);
+    } 
+  }
+
+  async function clearProcessedAutomobili() {
     try {
         const client = await pool.connect();
-        const query = `UPDATE tasks SET processedids = '{}'`;
+        const query = `UPDATE ${tableNameAutomobili} SET ids = '{}'`;
         await client.query(query);
         client.release();
         console.log("Processed IDs - cleared");
@@ -75,8 +101,12 @@ async function addNewTask(title, email, url) {
 
 module.exports = {
     addNewTask: addNewTask,
-    updateTask: updateTask,
-    getTasks: getTasks,
-    clearProcessedIds: clearProcessedIds,
+    updateAutomobil: updateAutomobil,
+    getAutomobili: getAutomobili,
+    clearProcessedAutomobili: clearProcessedAutomobili,
+
+    getZida4: getZida4,
+    updateZida4: updateZida4,
+
     executeQuery: executeQuery,
 }

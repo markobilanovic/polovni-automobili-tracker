@@ -21,15 +21,16 @@ app.post('/addRecord', (req, res) => {
   res.sendStatus(204);
 });
 
-app.get('/clear', (req, res) => {
-  db.clearProcessedIds();
-  res.sendStatus(204);
-});
-
 app.post('/executeQuery', (req, res) => {
   const {query} = req.body;
   db.executeQuery(query);
   res.sendStatus(204);
 });
+
+// app.get('/clear', (req, res) => {
+//   db.clearProcessedIds();
+//   res.sendStatus(204);
+// });
+
 
 app.listen(process.env.PORT || 4000, () => console.log('Node app is working!'));
