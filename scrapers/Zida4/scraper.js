@@ -47,17 +47,8 @@ async function parseArticles(articles, processedIds) {
             continue;
         }
 
-        const articleObj = await parseArticle(article, articleID, url);
-        console.log(articleObj);
-        const outerHTMLElement = await article.getProperty("outerHTML");
-        let outerHTML = await outerHTMLElement.jsonValue();
-
-        const item = {
-            articleID,
-            outerHTML,
-        }
-
-        newArticles.push(item);
+        const article = await parseArticle(article, articleID, url);
+        newArticles.push(article);
     }
     return newArticles;
 }

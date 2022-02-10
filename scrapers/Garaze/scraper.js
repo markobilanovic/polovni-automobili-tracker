@@ -51,7 +51,6 @@ async function parseArticles(articles, processedIds) {
         }
 
         const newArticle = await parseArticle(article, articleID, url);
-        console.log(newArticle);
         newArticles.push(newArticle);
     }
     return newArticles;
