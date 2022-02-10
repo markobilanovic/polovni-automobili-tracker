@@ -4,7 +4,7 @@ let page;
 
 async function scrapeURL(baseURL, processedIds) {
     let articles = [];
-    page = puppeteerManager.getPage();
+    page = getPage();
     await page.goto(baseURL);
 
     // process first page
