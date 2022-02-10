@@ -6,19 +6,6 @@ function getEmailBody(articles) {
     return html;
 }
 
-/*
-        id,
-        imageURL,
-        url,
-        price,
-        m2,
-        rooms,
-        floor,
-        heat,
-        location,
-        desc,
-*/
-
 function getArticleHTML(article) {
     const {id,
       imageURL,

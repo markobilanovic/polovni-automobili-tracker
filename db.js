@@ -77,6 +77,30 @@ async function addNewTask(title, email, url) {
     } 
   }
 
+
+  async function getGaraze() {
+    try {
+      const client = await pool.connect();
+      const result = await client.query(`SELECT * FROM garaze`);
+      const results = result ? result.rows : null;
+      client.release();
+      return results;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function updateGaraze(title, email, newIds) {
+    try {
+      const client = await pool.connect();
+      const query = `UPDATE garaze SET ids = ids || '{${newIds.join(",")}}' WHERE title = 'Garaze'`;
+      await client.query(query);
+      client.release();
+    } catch (err) {
+      console.error(err);
+    } 
+  }
+
   async function clearProcessedAutomobili() {
     try {
         const client = await pool.connect();
@@ -107,6 +131,9 @@ module.exports = {
 
     getZida4: getZida4,
     updateZida4: updateZida4,
+
+    getGaraze: getGaraze,
+    updateGaraze: updateGaraze,
 
     executeQuery: executeQuery,
 }

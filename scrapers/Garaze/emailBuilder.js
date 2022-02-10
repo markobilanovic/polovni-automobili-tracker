@@ -7,20 +7,19 @@ function getEmailBody(articles) {
 }
 
 function getArticleHTML(article) {
-    const {title, subtitle, articleURL, imageURL, price, year, km, city, cm3, hp} = article;
+    const {title,
+      imageURL,
+      url,
+      location,
+      description} = article;
     const articleHTML = `<div>
         <h2>${title}</h2>
-        <a href="${articleURL}">
+        <a href="${url}">
           <img src="${imageURL}" />
         </a>
         <div>
-          <h3>${price}</h3>
-          <h3>${year}</h3>
-          <h3>${km}</h3>
-          <div>${city}</div>
-          <br/>
-          <div>${cm3}, ${hp}</div>
-          ${subtitle ? `<div>${subtitle}</div>` : ""}
+          <h3>${location}</h3>
+          <h3>${description}</h3>
         </div>
       </div>`;
 
