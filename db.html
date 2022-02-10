@@ -7,10 +7,14 @@
                 return;
             }
 
+            const data = {
+                query,
+            }
+
             fetch("/executeQuery", {
                 method: "POST",
                 headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify(query)
+                body: JSON.stringify(data)
             })
             .then((res) => {
                 var form = document.getElementById("queryForm");
@@ -26,12 +30,10 @@
     <form id="queryForm" action="javascript:executeQuery()">
         <fieldset>
         <label>Query</label>
-        <input type="text" id='query' name="query" required>
-        <br><br>
-
-        <button type="submit">
-            Execute Query
-        </button>
+        <textarea type="text" id='query' name="query" required></textarea>
+        <br>
+        <br>
+        <button type="submit">Execute Query</button>
         </fieldset>
     </form>
 
