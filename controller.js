@@ -26,7 +26,7 @@ app.get('/clear', (req, res) => {
   res.sendStatus(204);
 });
 
-app.get('/executeQuery', (req, res) => {
+app.post('/executeQuery', (req, res) => {
   const {query} = req.body;
   db.executeQuery(query);
   res.sendStatus(204);
