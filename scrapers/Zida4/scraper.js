@@ -47,8 +47,8 @@ async function parseArticles(articles, processedIds) {
             continue;
         }
 
-        const article = await parseArticle(article, articleID, url);
-        newArticles.push(article);
+        const newArticle = await parseArticle(article, articleID, url);
+        newArticles.push(newArticle);
     }
     return newArticles;
 }
