@@ -75,8 +75,10 @@ async function parseArticle(article, id, url) {
     const description = await article.$$eval('p[itemprop="description"]', (options) =>
         options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
     );
+    const id = url;
 
     return {
+        id,
         title,
         imageURL,
         url,
