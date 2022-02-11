@@ -10,6 +10,7 @@ function getArticleHTML(article) {
     const {title,
       imageURL,
       url,
+      price,
       location,
       description} = article;
     const articleHTML = `<div>
@@ -18,7 +19,8 @@ function getArticleHTML(article) {
           <img src="${imageURL}" />
         </a>
         <div>
-          <h3>${location}</h3>
+        <h3>${price}</h3>
+        <h3>${location}</h3>
           <h3>${description}</h3>
         </div>
       </div>`;
