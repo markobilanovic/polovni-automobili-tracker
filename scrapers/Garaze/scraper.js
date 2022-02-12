@@ -41,7 +41,6 @@ async function parseArticles(articles, processedIds) {
         const articleID = parts[parts.length - 2];
         url = "https://www.oglasi.rs" + url;
 
-
         if (!articleID) {
             continue;
         }
@@ -76,9 +75,15 @@ async function parseArticle(article, id, url) {
         options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
     );
 
+    const [price] = await article.$$eval('span.text-price > strong', (options) =>
+    options.map((option) => option.textContent.replaceAll("\t", "").replaceAll("\n", ""))
+);
+    // text-price
+
     return {
         id,
         title,
+        price,
         imageURL,
         url,
         location,
